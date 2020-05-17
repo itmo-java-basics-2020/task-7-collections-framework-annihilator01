@@ -9,8 +9,8 @@ import java.util.LinkedList;
  */
 public class FirstUnique {
 
-    private HashMap<Integer, Integer> numberCount;
-    private LinkedList<Integer> order;
+    private final HashMap<Integer, Integer> numberCount;
+    private final LinkedList<Integer> order;
 
     public FirstUnique(int[] numbers) {
         numberCount = new HashMap<>();

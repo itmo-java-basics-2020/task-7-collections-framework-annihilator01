@@ -1,6 +1,6 @@
 package ru.ifmo.collections;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Represents LRU cache with fixed maximum capacity.
@@ -14,13 +14,12 @@ import java.util.HashMap;
  */
 public class LruCache<K, V> {
 
-    private HashMap<K, Node<K, V>> cache;
-    private Node<K, V> head, tail;
+    private final LinkedHashMap<K, V> cache;
     private int capacity;
 
     public LruCache(int capacity) {
         this.capacity = capacity;
-        this.cache = new HashMap<>();
+        this.cache = new LinkedHashMap<>(capacity);
     }
 
     public V get(K key) {
@@ -28,77 +27,30 @@ public class LruCache<K, V> {
             return null;
         }
 
-        Node<K, V> node = cache.get(key);
-        raiseNodeToHead(node);
+        V value = cache.get(key);
+        raiseToTop(key, value);
 
-        return node.val;
+        return value;
     }
 
     public void put(K key, V value) {
         if (cache.containsKey(key)) {
-            Node<K, V> node = cache.get(key);
-            node.val = value;
-            raiseNodeToHead(node);
+             raiseToTop(key, value);
         } else {
             if (cache.size() == capacity) {
-                removeCached(tail);
+                cache.remove(cache.keySet().iterator().next());
             }
 
-            Node<K, V> newNode = new Node<>();
-            newNode.key = key;
-            newNode.val = value;
-            addCached(newNode);
+            cache.put(key, value);
         }
     }
 
-    private void raiseNodeToHead(Node<K, V> node) {
-        removeNode(node);
-        addNodeToHead(node);
-    }
-
-    private void addCached(Node<K, V> node) {
-        cache.put(node.key, node);
-        addNodeToHead(node);
-    }
-    private void removeCached(Node<K, V> node) {
-        cache.remove(node.key);
-        removeNode(node);
-    }
-
-    private void addNodeToHead(Node<K, V> node) {
-        if (head == null) {
-            head = node;
-            tail = node;
-            return;
-        }
-
-        head.left = node;
-        node.right = head;
-        head = node;
-    }
-
-    private void removeNode(Node<K, V> node) {
-        if (node.left != null) {
-            node.left.right = node.right;
-        } else {
-            head = node.right;
-        }
-
-        if (node.right != null) {
-            node.right.left = node.left;
-        } else {
-            tail = node.left;
-        }
+    private void raiseToTop(K key, V value) {
+        cache.remove(key);
+        cache.put(key, value);
     }
 
     public int elements() {
         return cache.size();
-    }
-
-    static class Node<K, V> {
-        K key;
-        V val;
-        Node<K, V> left;
-        Node<K, V> right;
     }
 }
