@@ -1,7 +1,6 @@
 package ru.ifmo.collections;
 
-import java.util.AbstractSet;
-import java.util.Comparator;
+import java.util.*;
 
 /**
  * Represents sorted set of unique values.
@@ -16,21 +15,69 @@ import java.util.Comparator;
  *
  * @param <T> set contents type
  */
-public abstract class SortedSet<T> extends AbstractSet<T> {
-    // private final Map<???, ???> contents; TODO decide Map implementation and key/value types. "???" is used just as an example
+public class SortedSet<T> extends AbstractSet<T> {
+
+    private final TreeMap<T, Object> contents;
+    private final Object control;
+
+    private SortedSet(TreeMap<T, Object> contents) {
+        this.contents = contents;
+        this.control = new Object();
+    }
+
     public static <T> SortedSet<T> create() {
-        throw new UnsupportedOperationException(); // TODO implement
+        return new SortedSet<>(new TreeMap<>());
     }
 
     public static <T> SortedSet<T> from(Comparator<T> comparator) {
-        throw new UnsupportedOperationException(); // TODO implement
+        return new SortedSet<>(new TreeMap<>(comparator));
     }
 
-    public T[] getSorted() {
-        throw new UnsupportedOperationException(); // TODO implement
+    @Override
+    public Iterator<T> iterator() {
+        return contents.keySet().iterator();
     }
 
-    public T[] getReversed() {
-        throw new UnsupportedOperationException(); // TODO implement
+    @Override
+    public int size() {
+        return contents.size();
+    }
+
+    @Override
+    public boolean add(T element) {
+        return contents.put(element, control) == null;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends T> collection) {
+        boolean isChanged = false;
+        for (T element: collection) {
+            isChanged |= add(element);
+        }
+
+        return isChanged;
+    }
+
+    @Override
+    public boolean remove(Object element) {
+        return contents.remove(element, control);
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> collection) {
+        boolean isChanged = false;
+        for (Object element: collection) {
+            isChanged |= remove(element);
+        }
+
+        return isChanged;
+    }
+
+    public List<T> getSorted() {
+        return new ArrayList<>(contents.keySet());
+    }
+
+    public List<T> getReversed() {
+        return new ArrayList<>(contents.descendingKeySet());
     }
 }
