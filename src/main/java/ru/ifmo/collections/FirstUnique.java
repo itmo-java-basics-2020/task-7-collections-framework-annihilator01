@@ -6,6 +6,7 @@ import java.util.LinkedList;
 /**
  * Design a class which contains integers and returns first unique integer (in order of addition).
  * FirstUniqueTest can be used as an example.
+ * 0_o
  */
 public class FirstUnique {
 
